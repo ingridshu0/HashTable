@@ -1,0 +1,153 @@
+package hashTable;
+/**
+ * 
+ * @author ingrid
+ *
+ */
+
+public class HashTable {
+	
+	private Entry[] table;
+	// private Entry<K, V> data;  // ??????
+	private int size;
+	private int capacity = 0;
+	
+	// default constructor sets size of table to 100
+	public HashTable()
+	{
+		table = new Entry[100];
+		size = 100;
+	}
+
+	/** 
+	 * constructor that sets size to value of param
+	 * @param s, size of table
+	 */
+	public HashTable(int s){
+		table = new Entry[s];
+		size = s;
+	}
+	/**
+	 * places a key/value pair in the hashtable
+	 * @param key
+	 * @param value
+	 */
+	public void put(k<K>, V v) //??
+	{
+		capacity++;
+		
+		// when to rehash
+		if(capacity / size >= .6)
+		{
+			rehash();
+		}
+		
+		K key = Math.abs(key.hashCode());
+		int quadratic = 1;
+		
+		while(true)
+		{
+			if(table[key % size] == null)
+			{
+				table[key % size] = v;
+				return;
+			}
+			else
+			{
+				if(table[key%size + quadratic] == null)
+				{
+					table[key%size + quadratic] = v;
+					return;
+				}
+				quadratic = quadratic * 2;
+			}
+		}
+	}
+	
+	
+	/** returns string representation of hashtable
+	 * @param none
+	 * @return string representation of hashtable
+	 */
+	public String toString()
+	{
+		String s = "";
+		for(int i = 0; i < table.length; i++)
+		{
+			if(table[i] != null)
+			{
+				s = s + table[i].toString() + ", ";
+			}
+			else
+			{
+				s = s + "null, ";
+			}
+		}
+		
+		return s;
+	}
+	
+	/** doubles the size of the array and rehashes the values based on the updated size
+	 * @param none
+	 * @return none
+	 */
+	private void rehash()
+	{
+		Entry[] copy = new Entry[size];
+		
+		for(int i = 0; i < size; i++)
+		{
+			copy[i] = table[i];
+		}
+		
+		size = size * 2;
+		table = new Entry[size];
+		
+		for(int i = 0; i < size; i++)
+		{
+			Entry o = copy[i];
+			table[i].put(o.getKey(), o.getValue()); // ??
+		}
+	}
+	
+	/**
+	 * stores key / value pairs
+	 *
+	 * @param <K>
+	 * @param <V>
+	 */
+	private class Entry<K, V>
+	{
+		private K key;
+		private V value;
+		
+		/**
+		 * constructor
+		 * @param k key
+		 * @param v value
+		 */
+		private Entry(K k, V v)
+		{
+			key = k;
+			value = v;
+		}
+		
+		/**
+		 * key accessor method
+		 * @return
+		 */
+		public K getKey()
+		{
+			return key;
+		}
+		
+		/**
+		 * value accessor method
+		 * @return
+		 */
+		public V getValue()
+		{
+			return value;
+		}
+	}
+}
