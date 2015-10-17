@@ -1,0 +1,252 @@
+// package hashTable;
+
+
+/**
+ * @author Ingrid Shu
+ * HashTable
+ * 10/16/2015 (sorry)
+ */
+
+public class HashTable<K, V> {
+	
+	private Entry<K, V>[] table;
+	private int size;
+	private int numEntries = 0;
+	
+	/** 
+	 * default constructor sets size of table to 100
+	 */
+	public HashTable()
+	{
+		table = new Entry[100];
+		size = 100;
+	}
+	
+
+	/** 
+	 * constructor that sets size to value of param
+	 * @param s, size of table
+	 */
+	public HashTable(int s){
+		table = new Entry[s];
+		size = s;
+	}
+	
+	
+	/**
+	 * places a key/value pair in the HashTable
+	 * @param key
+	 * @param value
+	 */
+	public void put(K k, V v) //??
+	{
+		Entry<K,V> e = new Entry<K,V>(k, v);
+		
+		// when to rehash- .6 is load factor
+		if(numEntries / size >= .6)
+		{
+			rehash();
+		}
+		
+		int start = Math.abs(k.hashCode()) % size;
+		
+		while(table[start] != null && table[start].getKey() != k)
+		{
+			start++;
+		}
+		
+		table[start] = e;
+		
+		numEntries++;
+	}
+	
+	
+	/** 
+	 * returns string representation of HashTable
+	 * @param none
+	 * @return string representation of HashTable
+	 */
+	public String toString()
+	{
+		String s = "";
+		for(int i = 0; i < table.length; i++)
+		{
+			if(table[i] != null)
+			{
+				s = s + table[i].getKey().toString() + " --> " + table[i].getValue().toString() + ", ";
+			}
+			else
+			{
+				s = s + "null, ";
+			}
+		}
+		
+		return s;
+	}
+	
+	
+	/** 
+	 * doubles the size of the array and rehashes the values based on the updated size
+	 * creates a temporary array to store the values in table then re-put()s values into table
+	 * @param none
+	 * @return none
+	 */
+	public void rehash()
+	{
+		Entry<K, V>[] temp = table;
+		
+		size*=2;
+		table = new Entry[size];
+		Entry<K, V> e;
+				
+		for(int i = 0; i < size/2; i++)
+		{
+			if(temp[i] != null)
+			{
+				e = temp[i]; 
+				put(e.getKey(), e.getValue());
+			}
+		}
+		
+		
+	}
+	
+	
+	/**
+	 * Removes the Entry with the corresponding key and returns its value. Returns null if the key does not exist in the table.
+	 * @param key
+	 * @return
+	 */
+	public V remove(K key)
+	{
+		if(containsKey(key) == false){
+			return null;
+		}
+		
+		// tracks where key is
+		int start = Math.abs(key.hashCode()) % size;
+		
+		while(table[start].getKey() != key)
+		{
+			start++;
+		}
+		
+		Entry<K, V> e = table[start];
+		
+		table[start] = null;
+		
+		// re-put()s entries after the entry removed to reorganise collisions that might have originally happened
+		while(table[start + 1] != null)
+		{
+			put(table[start + 1].getKey(), table[start + 1].getValue());
+			start++;
+		}
+		
+		numEntries--;
+		
+		return e.getValue();
+	}
+	
+
+	/**
+	 * Returns the value that corresponds to key. Returns null if the key does not exist in the table.
+	 * @param key
+	 * @return
+	 */
+	public V get(K key)
+	{
+		if(containsKey(key) == false)
+		{
+			return null;
+		}
+		
+		// first possible index the entry could have been placed at
+		// can be increased to find the index in case of collisions
+		int start = Math.abs(key.hashCode()) % size;
+		
+		while(table[start].getKey() != key)
+		{
+			start++;
+		}
+		
+		return table[start].getValue();
+	}
+	
+	
+	/**
+	 * Returns whether or not key exists in the table.
+	 * @param key
+	 * @return
+	 */
+	public boolean containsKey(K key)
+	{
+		int start = Math.abs(key.hashCode()) % size;
+		
+		while(table[start] != null)
+		{
+			if(table[start].getKey() == key)
+			{
+				return true;
+			}
+			
+			start++;
+		}
+		
+		return false;
+	}
+	
+	
+	/**
+	 * Returns whether or not value exists in the table.
+	 * cannot be constant time (can only be n time)
+	 * @param value
+	 * @return
+	 */
+	public boolean containsValue(V value)
+	{
+		 for(int i = 0; i < size; i++)
+		 {
+			 if(table[i] != null && table[i].getValue() == value)
+			 {
+				 return true;
+			 }
+		 }
+		 
+		 // value does not exist
+		 return false;
+	}
+	
+	
+	/**
+	 * stores key / value pairs
+	 * Nested class used to hold key-value pairings.
+	 * @param <K>
+	 * @param <V>
+	 */
+	private class Entry<K, V>
+	{
+		public K key;
+		public V value;
+		
+		/**
+		 * constructor
+		 * @param k key
+		 * @param v value
+		 */
+		public Entry(K k, V v)
+		{
+			key = k;
+			value = v;
+		}
+		
+		public K getKey()
+		{
+			return key;
+		}
+		
+		public V getValue()
+		{
+			return value;
+		}
+	}
+}
